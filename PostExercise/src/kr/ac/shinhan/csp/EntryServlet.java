@@ -17,19 +17,17 @@ public class EntryServlet extends HttpServlet {
 			throws IOException 
 	{			
 			String token = null;			
-			String id = null;			
-			String expireDate = null;
+			String id = null;				
 			boolean success = false;
 			
 			PersistenceManager pm = MyPersistentManager.getManager();
 			Query qry = pm.newQuery(UserLoginToken.class);
 			List<UserLoginToken> userLoginToken = (List<UserLoginToken>) qry.execute();
-
 					
 			//쿠키를 읽습니다
 			Cookie[] cookieList = req.getCookies();			
 			// 쿠키가 없을경우 로그인화면으로
-			if (cookieList == null)
+			if (cookieList == null || cookieList.length == 0)
 			{
 				resp.sendRedirect("/login.html");
 			}		
@@ -49,30 +47,19 @@ public class EntryServlet extends HttpServlet {
 				{
 					if (ult.getToken().equals(token)) 
 					{
-						id = ult.getUserAccount();
-						expireDate = ult.getExpireDate();			
-						if (expireDate.equals("0")) 
-						{
-							resp.sendRedirect("/login.html");
-						}
+						//아이디 얻어오기
+						id = ult.getUserAccount();						
 						//토큰값 변경
-						else
-						{								
-							token = UUID.randomUUID().toString();
-							ult.setToken(token);
-							Cookie cookieToken = new Cookie("token", token);
-							cookieToken.setMaxAge(60*60*24*30);
-							resp.addCookie(cookieToken);							
-							success = true;			
-						}
-					}
-					else
-					{
-						resp.sendRedirect("/login.html");
-					}
-				}
+						token = UUID.randomUUID().toString();
+						ult.setToken(token);
+						//쿠키토큰값 변경
+						Cookie cookieToken = new Cookie("token", token);
+						cookieToken.setMaxAge(60*60*24*30);
+						resp.addCookie(cookieToken);
+						success = true;	
+					}				
+				}							
 			}					
-		
 			if (success) // id를 잘 얻었으면, 세션에 id를 등록하고 index.html을 연결합니다.
 			{
 				HttpSession session = req.getSession();

@@ -14,28 +14,13 @@ import javax.servlet.http.HttpSession;
 public class RetrieveTeamMemberServlet extends HttpServlet {
 
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws IOException {	
-		
-		String token = null;
+			throws IOException {		
 		
 		PersistenceManager pm = MyPersistentManager.getManager();
 		Query qry = pm.newQuery(TeamMember.class); 
-		List<TeamMember> memberList = (List<TeamMember>) qry.execute();		
+		List<TeamMember> memberList = (List<TeamMember>) qry.execute();	
 		
-		Query qry2 = pm.newQuery(UserLoginToken.class);
-		List<UserLoginToken> userLoginToken = (List<UserLoginToken>) qry2.execute();
-		Cookie[] cookieList = req.getCookies();
-		
-		for (Cookie c : cookieList) 
-		{
-			if (c.getName().equals("token")) 
-			{
-				token = c.getValue();
-			}			
-		}
-		HttpSession session = req.getSession(false);
-		session.getAttribute("id");
-		
+		HttpSession session = req.getSession(false);	
 			
 		resp.setCharacterEncoding("UTF-8");
 		resp.setContentType("text/plain");
@@ -43,15 +28,9 @@ public class RetrieveTeamMemberServlet extends HttpServlet {
 		resp.getWriter().println("<html>");
 		resp.getWriter().println("<body>");
 		resp.getWriter().println("<table border='1'>");				
-		
-		resp.getWriter().println(session.getAttribute("id")+"님 환영합니다.");
-		for (UserLoginToken ult : userLoginToken)
-		{
-			resp.getWriter().println("</br>db토큰 : " + ult.getToken() + "</br>");		
-		}
-		resp.getWriter().println("</br>쿠키토큰 : " + token + "</br>");
-		resp.getWriter().println("</br>간혹 토큰 바뀌는게 늦을 수 있으므로 다르면 보여진게 다르다면 새로고침 한번!"+ "</br>");
 		resp.getWriter().println("<tr>");
+		
+		resp.getWriter().println(session.getAttribute("id") + "님 환영합니다");		
 		
 		resp.getWriter().println("<th> 이름 </th>");
 		resp.getWriter().println("<th> 학번 </th>");
